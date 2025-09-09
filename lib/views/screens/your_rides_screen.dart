@@ -19,12 +19,14 @@ class YourRidesScreen extends StatelessWidget {
       body: ListView(
         children: [
           Container(
+            width: MediaQuery.of(context).size.width * 0.4,
             padding: EdgeInsets.all(7),
             color: Color(0xFFE8E7E7),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("${ride.dateTime}"),
+                Center(child: Text("${ride.dateTime}")),
                 Row(
                   children: [
                     Container(
@@ -58,22 +60,24 @@ class YourRidesScreen extends StatelessWidget {
                     Text("${ride.destination}"),
                   ],
                 ),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.047,
-                  width: MediaQuery.of(context).size.width * 0.5 ,
-                  child: ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor: WidgetStateProperty.all(
-                        Theme.of(context).primaryColor,
+                Center(
+                  child: SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.047,
+                    width: MediaQuery.of(context).size.width * 0.5 ,
+                    child: ElevatedButton(
+                      style: ButtonStyle(
+                        backgroundColor: WidgetStateProperty.all(
+                          Theme.of(context).primaryColor,
+                        ),
+                        foregroundColor: WidgetStatePropertyAll(Colors.white),
                       ),
-                      foregroundColor: WidgetStatePropertyAll(Colors.white),
-                    ),
-                    onPressed: () {},
-                    child: Text(
-                      "Detalhes",
-                      style: TextStyle(
-                        fontSize: 19,
-                        fontWeight: FontWeight.bold
+                      onPressed: () {},
+                      child: Text(
+                        "Detalhes",
+                        style: TextStyle(
+                          fontSize: 19,
+                          fontWeight: FontWeight.bold
+                        ),
                       ),
                     ),
                   ),

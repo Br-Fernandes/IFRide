@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:if_ride/models/auth_form_data.dart';
+import 'package:if_ride/services/auth_service.dart';
 
 class AuthScreen extends StatefulWidget {
   @override
@@ -8,10 +9,47 @@ class AuthScreen extends StatefulWidget {
 
 class _AuthScreenState extends State<AuthScreen> {
   final _formKey = GlobalKey<FormState>();
-
   final AuthFormData _formData = AuthFormData();
-
   bool _isObscure = true;
+
+  bool _isLoading = false;
+  final AuthService _authService = AuthService();
+
+  Future<void> _submit() async {
+    final isValid = _formKey.currentState?.validate() ?? false;
+    if (!isValid) return;
+
+    _formKey.currentState?.save();
+
+    setState(() => _isLoading = true);
+
+    try {
+      if (_formData.isLogin) {
+
+      } else {
+        await _authService.registerPassenger(
+          name: _formData.name,
+          email: _formData.email,
+          password: _formData.password,
+        );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Cadastro realizado com sucesso!"),
+            backgroundColor: Colors.green,
+          )
+        );
+      }
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error.toString()),
+          backgroundColor: Colors.red,
+        )
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +74,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 height:
                     _formData.isSignup
                         ? MediaQuery.of(context).size.height * 0.4
-                        : MediaQuery.of(context).size.height * 0.29,
+                        : MediaQuery.of(context).size.height * 0.30,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -62,6 +100,14 @@ class _AuthScreenState extends State<AuthScreen> {
 
   TextFormField nameTextFormField(BuildContext context) {
     return TextFormField(
+      key: const ValueKey('name'),
+      onSaved: (name) => _formData.name = name ?? '',
+      validator: (name) {
+        if (name == null || name.trim().length < 4) {
+          return 'Nome deve ter no mínimo 4 caracteres.';
+        }
+        return null;
+      },
       cursorColor: Theme.of(context).primaryColor,
       decoration: InputDecoration(
         label: Text("nome completo"),
@@ -81,6 +127,14 @@ class _AuthScreenState extends State<AuthScreen> {
 
   TextFormField emailTextFormField(BuildContext context) {
     return TextFormField(
+      key: const ValueKey('email'),
+      onSaved: (email) => _formData.email = email ?? '',
+      validator: (email) {
+        if (email == null || !email.contains('@')) {
+          return 'Email inválido.';
+        }
+        return null;
+      },
       cursorColor: Theme.of(context).primaryColor,
       decoration: InputDecoration(
         label: Text("email"),
@@ -103,6 +157,18 @@ class _AuthScreenState extends State<AuthScreen> {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         TextFormField(
+          key: ValueKey(passwordLabel), 
+          onSaved: (password) {
+            if(passwordLabel == 'senha') {
+              _formData.password = password ?? '';
+            }
+          },
+          validator: (password) {
+            if (password == null || password.length < 6) {
+              return 'Senha deve ter no mínimo 6 caracteres.';
+            }
+            return null;
+          },
           obscureText: _isObscure,
           cursorColor: Theme.of(context).primaryColor,
           decoration: InputDecoration(
@@ -156,8 +222,10 @@ class _AuthScreenState extends State<AuthScreen> {
           ),
           foregroundColor: WidgetStatePropertyAll(Colors.white),
         ),
-        onPressed: () {},
-        child: Text(_formData.isSignup ? "Criar Conta" : "Entrar"),
+        onPressed: _isLoading ? null : _submit,
+        child: _isLoading
+            ? const CircularProgressIndicator(color: Colors.white)
+            : Text(_formData.isSignup ? "Criar Conta" : "Entrar"),
       ),
     );
   }

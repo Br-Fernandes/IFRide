@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeColors.lightTheme,
-      home: AuthScreen(),
+      home: YourRidesScreen(),
     );
   }
 }

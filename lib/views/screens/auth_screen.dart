@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:get/get.dart';
 import 'package:if_ride/models/auth_form_data.dart';
 import 'package:if_ride/services/auth_service.dart';
+import 'package:if_ride/views/screens/home_screen.dart';
 
 class AuthScreen extends StatefulWidget {
   @override
@@ -14,6 +17,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
   bool _isLoading = false;
   final AuthService _authService = AuthService();
+  final _storage = const FlutterSecureStorage();
 
   Future<void> _submit() async {
     final isValid = _formKey.currentState?.validate() ?? false;
@@ -25,7 +29,16 @@ class _AuthScreenState extends State<AuthScreen> {
 
     try {
       if (_formData.isLogin) {
+        final response = await _authService.login(
+          email: _formData.email,
+          password: _formData.password
+        );
 
+        await _storage.write(key: 'jwt_token', value: response['token']);
+
+        if (mounted) {
+          Get.to(HomeScreen());
+        }
       } else {
         await _authService.registerPassenger(
           name: _formData.name,
@@ -34,10 +47,12 @@ class _AuthScreenState extends State<AuthScreen> {
         );
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("Cadastro realizado com sucesso!"),
+            content: Text("Cadastro realizado com sucesso! Por favor, faça o login."),
             backgroundColor: Colors.green,
           )
         );
+
+        setState(() => _formData.toggleAuthMode());
       }
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -47,7 +62,9 @@ class _AuthScreenState extends State<AuthScreen> {
         )
       );
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 

@@ -39,4 +39,37 @@ class AuthService {
       throw Exception('Nao foi possivel se conectar ao servidor');
     }
   }
+
+  Future<Map<String, dynamic>> login({
+    required String email,
+    required String password
+  }) async {
+    final url = Uri.parse('$_baseURL/auth/login');
+
+    final Map<String, String> body = {
+      email: "email",
+      password: "password"
+    };
+
+    print(password);
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json; charset=UTF-8'},
+        body: jsonEncode(body)
+      );
+
+      if (response.statusCode == 200) {
+        print('Login bem-sucedido!');
+        return jsonDecode(response.body); 
+      } else {
+        print('Falha no login: ${response.body}');
+        throw Exception('Email ou senha inválidos.');
+      }
+    } catch (e) {
+      print('Erro de conexão: $e');
+      throw Exception('Não foi possível se conectar ao servidor.');
+    }
+  }
 }

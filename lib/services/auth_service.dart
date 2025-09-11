@@ -47,8 +47,8 @@ class AuthService {
     final url = Uri.parse('$_baseURL/auth/login');
 
     final Map<String, String> body = {
-      email: "email",
-      password: "password"
+      "email": email,
+      "password": password
     };
 
     print(password);

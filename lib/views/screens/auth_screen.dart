@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:if_ride/models/auth_form_data.dart';
 import 'package:if_ride/services/auth_service.dart';
 import 'package:if_ride/views/screens/home_screen.dart';
@@ -17,7 +17,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
   bool _isLoading = false;
   final AuthService _authService = AuthService();
-  final _storage = const FlutterSecureStorage();
+  final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
   Future<void> _submit() async {
     final isValid = _formKey.currentState?.validate() ?? false;

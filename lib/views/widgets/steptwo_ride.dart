@@ -11,7 +11,7 @@ class SteptwoRide extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          _RideCard(),
+          RideCard(),
           NextStepButton()
         ],
       ),
@@ -19,8 +19,8 @@ class SteptwoRide extends StatelessWidget {
   }
 }
 
-class _RideCard extends StatelessWidget {
-  const _RideCard();
+class RideCard extends StatelessWidget {
+  const RideCard();
 
   @override
   Widget build(BuildContext context) {

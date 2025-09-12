@@ -5,6 +5,7 @@ import 'package:if_ride/views/screens/home_screen.dart';
 import 'package:if_ride/views/screens/main_navigation_screen.dart';
 import 'package:if_ride/views/screens/new_ride_screen.dart';
 import 'package:if_ride/views/screens/your_rides_screen.dart';
+import 'package:if_ride/views/widgets/recurring_ride.dart';
 import 'package:if_ride/views/widgets/steptwo_ride.dart';
 
 void main() {
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeColors.lightTheme,
-      home: AuthScreen(),
+      home: RecurringRide(),
     );
   }
 }

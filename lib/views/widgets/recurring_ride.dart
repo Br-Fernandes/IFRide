@@ -35,7 +35,6 @@ class _RecurringRideState extends State<RecurringRide> {
               ],
             ),
           ),
-          Button
         ],
       ),
     );

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:if_ride/controllers/auth_controller.dart';
 import 'package:if_ride/utils/themes.dart';
 import 'package:if_ride/views/screens/auth_screen.dart';
 import 'package:if_ride/views/screens/home_screen.dart';
@@ -17,7 +19,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       title: 'Flutter Demo',
       theme: ThemeColors.lightTheme,
       home: RecurringRide(),
@@ -25,3 +27,19 @@ class MyApp extends StatelessWidget {
   }
 }
 
+class Initializer extends StatelessWidget {
+  const Initializer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final AuthController authController = Get.put(AuthController(), permanent: true);
+  
+    return Obx(() {
+      if(authController.isAuthenticated) {
+        return const MainNavigationScreen();
+      } else {
+        return AuthScreen();
+      }
+    });
+  }
+}

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:if_ride/controllers/auth_controller.dart';
 import 'package:if_ride/models/auth_form_data.dart';
 import 'package:if_ride/services/auth_service.dart';
 import 'package:if_ride/views/screens/home_screen.dart';
+import 'package:if_ride/views/screens/main_navigation_screen.dart';
 
 class AuthScreen extends StatefulWidget {
   @override
@@ -20,53 +22,28 @@ class _AuthScreenState extends State<AuthScreen> {
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
   Future<void> _submit() async {
-    final isValid = _formKey.currentState?.validate() ?? false;
-    if (!isValid) return;
+  final isValid = _formKey.currentState?.validate() ?? false;
+  if (!isValid) return;
 
-    _formKey.currentState?.save();
+  _formKey.currentState?.save();
+  setState(() => _isLoading = true);
 
-    setState(() => _isLoading = true);
+  final authController = Get.find<AuthController>();
 
-    try {
-      if (_formData.isLogin) {
-        final response = await _authService.login(
-          email: _formData.email,
-          password: _formData.password
-        );
-
-        await _storage.write(key: 'jwt_token', value: response['token']);
-
-        if (mounted) {
-          Get.to(HomeScreen());
-        }
-      } else {
-        await _authService.registerPassenger(
-          name: _formData.name,
-          email: _formData.email,
-          password: _formData.password,
-        );
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Cadastro realizado com sucesso! Por favor, faça o login."),
-            backgroundColor: Colors.green,
-          )
-        );
-
-        setState(() => _formData.toggleAuthMode());
-      }
-    } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(error.toString()),
-          backgroundColor: Colors.red,
-        )
-      );
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
+  if (_formData.isLogin) {
+    await authController.login(_formData.email, _formData.password);
+  } else {
+    await authController.register(
+      _formData.name,
+      _formData.email,
+      _formData.password,
+    );
   }
+
+  if (mounted) {
+    setState(() => _isLoading = false);
+  }
+}
 
   @override
   Widget build(BuildContext context) {

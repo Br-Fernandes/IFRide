@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:if_ride/views/widgets/steptwo_ride.dart';
 
 class RecurringRide extends StatefulWidget {
@@ -12,17 +13,30 @@ class _RecurringRideState extends State<RecurringRide> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Caronas Recorrentes')),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            ExpandableRideCard(day: "Segunda-Feira"),
-            ExpandableRideCard(day: "Terça-Feira"),
-            ExpandableRideCard(day: "Quarta-Feira"),
-            ExpandableRideCard(day: "Quinta-Feira"),
-            ExpandableRideCard(day: "Sexta-Feira"),
-          ],
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text('Caronas Recorrentes'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Get.close(1),
         ),
+        backgroundColor: Colors.white,
+      ),
+      body: Column(
+        children: [
+          SingleChildScrollView(
+            child: Column(
+              children: [
+                ExpandableRideCard(day: "Segunda-Feira"),
+                ExpandableRideCard(day: "Terça-Feira"),
+                ExpandableRideCard(day: "Quarta-Feira"),
+                ExpandableRideCard(day: "Quinta-Feira"),
+                ExpandableRideCard(day: "Sexta-Feira"),
+              ],
+            ),
+          ),
+          Button
+        ],
       ),
     );
   }
@@ -39,6 +53,7 @@ class ExpandableRideCard extends StatefulWidget {
 
 class _ExpandableRideCardState extends State<ExpandableRideCard> {
   bool _isExpanded = false;
+  bool _isChecked = false;
 
   @override
   Widget build(BuildContext context) {
@@ -49,9 +64,9 @@ class _ExpandableRideCardState extends State<ExpandableRideCard> {
         });
       },
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
+        duration: const Duration(seconds: 1),
         curve: Curves.easeInOut,
-        height: _isExpanded ? 350 : 80, 
+        height: _isExpanded ? MediaQuery.of(context).size.height * 0.8 : MediaQuery.of(context).size.height * 0.1, 
         margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         decoration: BoxDecoration(
           color: const Color(0xFFE8E7E7),
@@ -80,14 +95,27 @@ class _ExpandableRideCardState extends State<ExpandableRideCard> {
 
   Widget _buildHeader() {
     return Container(
-      height: 80, 
+      height: MediaQuery.of(context).size.height * 0.1, 
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            widget.day, 
-            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          Row(
+            children: [ 
+              Text(
+                widget.day, 
+                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ),
+              Checkbox(
+                checkColor: Colors.blueAccent,
+                value: _isChecked,
+                 onChanged: (bool? checked) {
+                  setState(() {
+                    _isChecked = checked!;
+                  });
+                 } 
+              )
+            ]  
           ),
           Icon(_isExpanded
               ? Icons.keyboard_arrow_up_sharp

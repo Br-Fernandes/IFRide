@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:if_ride/views/widgets/steptwo_ride.dart';
 
+import 'ride_card_widgets/passenger_selector.dart';
+import 'ride_card_widgets/time_selector.dart';
+import 'ride_card_widgets/value_display.dart';
+
 class RecurringRide extends StatefulWidget {
   const RecurringRide({super.key});
 
@@ -22,20 +26,16 @@ class _RecurringRideState extends State<RecurringRide> {
         ),
         backgroundColor: Colors.white,
       ),
-      body: Column(
-        children: [
-          SingleChildScrollView(
-            child: Column(
-              children: [
-                ExpandableRideCard(day: "Segunda-Feira"),
-                ExpandableRideCard(day: "Terça-Feira"),
-                ExpandableRideCard(day: "Quarta-Feira"),
-                ExpandableRideCard(day: "Quinta-Feira"),
-                ExpandableRideCard(day: "Sexta-Feira"),
-              ],
-            ),
-          ),
-        ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            ExpandableRideCard(day: "Segunda-Feira"),
+            ExpandableRideCard(day: "Terça-Feira"),
+            ExpandableRideCard(day: "Quarta-Feira"),
+            ExpandableRideCard(day: "Quinta-Feira"),
+            ExpandableRideCard(day: "Sexta-Feira"),
+          ],
+        ),
       ),
     );
   }
@@ -65,7 +65,7 @@ class _ExpandableRideCardState extends State<ExpandableRideCard> {
       child: AnimatedContainer(
         duration: const Duration(seconds: 1),
         curve: Curves.easeInOut,
-        height: _isExpanded ? MediaQuery.of(context).size.height * 0.8 : MediaQuery.of(context).size.height * 0.1, 
+        height: _isExpanded ? MediaQuery.of(context).size.height * 0.7 : MediaQuery.of(context).size.height * 0.1, 
         margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         decoration: BoxDecoration(
           color: const Color(0xFFE8E7E7),
@@ -84,7 +84,7 @@ class _ExpandableRideCardState extends State<ExpandableRideCard> {
             children: [
               _buildHeader(),
               if (_isExpanded)
-                RideCard() 
+                wideCard(context) 
             ],
           ),
         ),
@@ -106,7 +106,8 @@ class _ExpandableRideCardState extends State<ExpandableRideCard> {
                 style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
               Checkbox(
-                checkColor: Colors.blueAccent,
+                checkColor:Color(0xFFEF1A1A),
+                activeColor: Theme.of(context).primaryColor,
                 value: _isChecked,
                  onChanged: (bool? checked) {
                   setState(() {
@@ -120,6 +121,29 @@ class _ExpandableRideCardState extends State<ExpandableRideCard> {
               ? Icons.keyboard_arrow_up_sharp
               : Icons.keyboard_arrow_down_sharp),
         ],
+      ),
+    );
+  }
+
+  Widget wideCard(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+
+    return Container(
+      height: size.height * 0.6,
+      //width: size.width * 0.8,
+      // decoration: BoxDecoration(
+      //   border: Border.all(color: Colors.black12),
+      // ),
+      child: Container(
+        padding: EdgeInsets.only(bottom: MediaQuery.of(context).size.height * 0.05),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const TimeSelector(),
+            const PassengerSelector(),
+            const ValueDisplay(),
+          ],
+        ),
       ),
     );
   }

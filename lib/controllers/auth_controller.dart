@@ -1,44 +1,64 @@
-import 'dart:convert'; 
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
+import 'package:if_ride/models/user.dart';
 import 'package:if_ride/services/auth_service.dart';
 import 'package:if_ride/views/screens/auth_screen.dart';
 import 'package:if_ride/views/screens/main_navigation_screen.dart';
 
-class AuthController extends GetxController {
+enum AuthStatus { loading, authenticated, unauthenticated }
 
+class AuthController extends GetxController {
   final _storage = const FlutterSecureStorage();
   final AuthService _authService = AuthService();
 
-  final Rxn<String> _token = Rxn<String>();
+  final authStatus = AuthStatus.loading.obs;
+  final currentUser = Rxn<User>();
 
-  bool get isAuthenticated => _token.value != null;
-  String? get token => _token.value;
+  User? get user => currentUser.value;
+  bool get isAuthenticated => authStatus.value == AuthStatus.authenticated;
 
   @override
   void onInit() {
     super.onInit();
-    tryAutoLogin();
+    _tryAutoLogin(); 
   }
 
-  Future<void> tryAutoLogin() async {
+  Future<void> _tryAutoLogin() async {
     final storedToken = await _storage.read(key: 'jwt_token');
-    if(storedToken != null) {
-      _token.value = storedToken;
+    if (storedToken == null) {
+      authStatus.value = AuthStatus.unauthenticated;
+      return;
+    }
+    await _fetchCurrentUser(storedToken);
+  }
+
+  Future<void> _fetchCurrentUser(String token) async {
+    try {
+      await Future.delayed(const Duration(seconds: 1)); 
+      final decodedToken = _decodeJwt(token); 
+      currentUser.value = User(id: 'mock-id-123', name: 'Usuário Logado', email: decodedToken['sub']);
+      
+      authStatus.value = AuthStatus.authenticated;
+    } catch (e) {
+      await logout();
     }
   }
 
   Future<void> login(String email, String password) async {
     try {
+      authStatus.value = AuthStatus.loading;
       final response = await _authService.login(email: email, password: password);
       final receivedToken = response['token'];
-      print(receivedToken);
-      _token.value = receivedToken;
+
       await _storage.write(key: 'jwt_token', value: receivedToken);
-      Get.offAll(MainNavigationScreen());
+      await _fetchCurrentUser(receivedToken); 
+      
+      Get.offAll(() => MainNavigationScreen());
+
     } catch (e) {
+      authStatus.value = AuthStatus.unauthenticated;
       Get.snackbar(
         'Erro no Login',
         e.toString().replaceAll('Exception: ', ''),
@@ -50,16 +70,42 @@ class AuthController extends GetxController {
   }
 
   Future<void> logout() async {
-    _token.value = null;
+    currentUser.value = null;
     await _storage.delete(key: 'jwt_token');
+    authStatus.value = AuthStatus.unauthenticated;
     Get.offAll(() => AuthScreen());
   }
 
   Future<void> register(String name, String email, String password) async {
-    _authService.registerPassenger(
-      name: name,
-      email: email,
-      password: password
-    );
+    try {
+      authStatus.value = AuthStatus.loading;
+      await _authService.registerPassenger(
+        name: name,
+        email: email,
+        password: password,
+      );
+      Get.snackbar(
+        'Sucesso!',
+        'Conta criada. Por favor, faça o login.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      Get.snackbar('Erro no Registro', e.toString());
+    } finally {
+      authStatus.value = AuthStatus.unauthenticated;
+    }
+  }
+  
+  Map<String, dynamic> _decodeJwt(String token) {
+    final parts = token.split('.');
+    if (parts.length != 3) {
+      throw Exception('Token inválido');
+    }
+    final payload = parts[1];
+    final normalized = base64Url.normalize(payload);
+    final resp = utf8.decode(base64Url.decode(normalized));
+    return json.decode(resp);
   }
 }

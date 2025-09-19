@@ -40,7 +40,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           HomeScreen(),
           NewRideScreen(),
           YourRidesScreen(),
-          ConversationsScreen(),
+          ChatScreen(),
           AccountScreen()
         ],
       ),

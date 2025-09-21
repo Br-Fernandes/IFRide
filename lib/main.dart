@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:if_ride/controllers/auth_controller.dart';
 import 'package:if_ride/utils/themes.dart';
 import 'package:if_ride/views/screens/auth_screen.dart';
+import 'package:if_ride/views/screens/conversations_screen.dart';
 import 'package:if_ride/views/screens/home_screen.dart';
 import 'package:if_ride/views/screens/main_navigation_screen.dart';
 import 'package:if_ride/views/screens/new_ride_screen.dart';
@@ -23,7 +24,7 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'Flutter Demo',
       theme: ThemeColors.lightTheme,
-      home: NewRideScreen(),
+      home: ConversationsScreen(),
     );
   }
 }

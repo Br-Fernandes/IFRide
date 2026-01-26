@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:if_ride/views/screens/account_screen.dart';
-import 'package:if_ride/views/screens/conversations_screen.dart';
 import 'package:if_ride/views/screens/home_screen.dart';
 import 'package:if_ride/views/screens/new_ride_screen.dart';
 import 'package:if_ride/views/screens/your_rides_screen.dart';

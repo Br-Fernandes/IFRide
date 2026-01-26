@@ -4,8 +4,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:if_ride/controllers/auth_controller.dart';
 import 'package:if_ride/models/auth_form_data.dart';
 import 'package:if_ride/services/auth_service.dart';
-import 'package:if_ride/views/screens/home_screen.dart';
-import 'package:if_ride/views/screens/main_navigation_screen.dart';
 
 class AuthScreen extends StatefulWidget {
   @override

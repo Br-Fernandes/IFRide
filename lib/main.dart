@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:if_ride/controllers/auth_controller.dart';
 import 'package:if_ride/models/chat.dart';
 import 'package:if_ride/utils/themes.dart';
+import 'package:if_ride/views/screens/account_screen.dart';
 import 'package:if_ride/views/screens/auth_screen.dart';
 import 'package:if_ride/views/screens/chat_screen.dart';
 import 'package:if_ride/views/screens/conversations_screen.dart';
@@ -30,8 +31,9 @@ class MyApp extends StatelessWidget {
 
     return GetMaterialApp(
       title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
       theme: ThemeColors.lightTheme,
-      home: ChatScreen(chat: Chat(id: "jksdfhj", usersId: ['50f8153a-e1e0-48ba-b025-30a494788364', 'db4b6134-b9fd-41d3-8685-b390f7f9af63']),),
+      home: AccountScreen() //ChatScreen(chat: Chat(id: "jksdfhj", usersId: ['50f8153a-e1e0-48ba-b025-30a494788364', 'db4b6134-b9fd-41d3-8685-b390f7f9af63']),),
     );
   }
 }

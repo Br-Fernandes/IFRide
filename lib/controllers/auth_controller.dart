@@ -38,7 +38,7 @@ class AuthController extends GetxController {
     try {
       await Future.delayed(const Duration(seconds: 1)); 
       final decodedToken = _decodeJwt(token); 
-      currentUser.value = User(id: 'mock-id-123', name: 'Usuário Logado', email: decodedToken['sub']);
+      currentUser.value = User(id: 'mock-id-123', name: 'Usuário Logado', email: decodedToken['sub'], imageUrl: "", city: "orizona");
       
       authStatus.value = AuthStatus.authenticated;
     } catch (e) {

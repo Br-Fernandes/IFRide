@@ -1,25 +1,90 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:if_ride/controllers/auth_controller.dart';
+import 'package:if_ride/models/user.dart';
 
 class AccountScreen extends StatelessWidget {
+
   AccountScreen({super.key});
 
   final authController = Get.find<AuthController>();
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Center(
-        child: ElevatedButton(
-          style: ButtonStyle(
-            backgroundColor: WidgetStateProperty.all<Color?>(Colors.red),
-            foregroundColor: WidgetStateProperty.all<Color?>(Colors.black)
-          ),
-          onPressed: () => authController.logout(),
-          child: Text("Sair da conta")
+    return Scaffold(
+      body: Padding(
+        padding: EdgeInsets.symmetric(horizontal: Get.width * 0.02, vertical: Get.height * 0.04),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AutoSizeText(
+                      user.name,
+                      maxFontSize: 25,
+                      minFontSize: 17,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold
+                      ),
+                    ),
+                    AutoSizeText(
+                      user.city,
+                      maxFontSize: 20,
+                      minFontSize: 12,
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontWeight: FontWeight.bold
+                      ),
+                    )
+                  ],
+                ),
+                CircleAvatar(
+                  radius: Get.height * 0.05,
+                  backgroundImage:
+                      user.imageUrl != null ? NetworkImage(user.imageUrl!) : null,
+                  child: user.imageUrl == null
+                      ? const Icon(Icons.person, size: 28)
+                      : null,
+                ),
+              ],
+            ),
+            SizedBox(
+              width: double.infinity,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextButton(
+                    onPressed: () {},
+                     child: Text(
+                      "Alterar foto de perfil",
+                      style: TextStyle(
+                        color: Theme.of(context).primaryColor
+                      ),
+                     )
+                  ),
+                  //SizedBox(height: Get.height * 0.08,),
+                  TextButton(
+                    onPressed: () {},
+                     child: Text(
+                      "Alterar dados pessoais",
+                      style: TextStyle(
+                        color: Theme.of(context).primaryColor
+                      ),
+                     )
+                  ),
+                ],
+              ),
+            )
+          ],
         ),
       ),
     );
   }
+
+  final user = User(id: 'mock-id-1', name: 'Usuário Logado', email: "", imageUrl: "", city: "Orizona");
 }
+

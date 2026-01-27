@@ -52,33 +52,70 @@ class AccountScreen extends StatelessWidget {
                 ),
               ],
             ),
+            SizedBox(height: Get.height * 0.04,),
             SizedBox(
               width: double.infinity,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  TextButton(
-                    onPressed: () {},
-                     child: Text(
+                  GestureDetector(
+                    onTap: () {},
+                    child: Text(
                       "Alterar foto de perfil",
                       style: TextStyle(
+                        fontWeight: FontWeight.bold,
                         color: Theme.of(context).primaryColor
                       ),
-                     )
+                    ),
                   ),
-                  //SizedBox(height: Get.height * 0.08,),
-                  TextButton(
-                    onPressed: () {},
-                     child: Text(
-                      "Alterar dados pessoais",
-                      style: TextStyle(
-                        color: Theme.of(context).primaryColor
-                      ),
-                     )
-                  ),
+                  SizedBox(height: Get.height * 0.02,),
+                  GestureDetector(
+                    onTap: () {},
+                    child: Text(
+                     "Alterar dados pessoais",
+                     style: TextStyle(
+                       fontWeight: FontWeight.bold,
+                       color: Theme.of(context).primaryColor
+                     ),
+                    ),
+                  )
                 ],
               ),
-            )
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: Get.width * 0.02, vertical: Get.height * 0.04),
+              height: 1,
+              color: Colors.grey,
+            ),
+            SizedBox(
+              width: double.infinity,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GestureDetector(
+                    onTap: () {},
+                    child: Text(
+                     "Sair",
+                     style: TextStyle(
+                       fontWeight: FontWeight.bold,
+                       color: Colors.black
+                     ),
+                    ),
+                  ),
+                  SizedBox(height: Get.height * 0.03,),
+                  GestureDetector(
+                    onTap: () {},
+                    child: Text(
+                     "Excluir conta",
+                     style: TextStyle(
+                       fontWeight: FontWeight.bold,
+                       color: Colors.red
+                     ),
+                    ),
+                  )  
+                ],
+              ),
+            ),
           ],
         ),
       ),

@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeColors.lightTheme,
-      home: AccountScreen() //ChatScreen(chat: Chat(id: "jksdfhj", usersId: ['50f8153a-e1e0-48ba-b025-30a494788364', 'db4b6134-b9fd-41d3-8685-b390f7f9af63']),),
+      home: NewRideScreen() //ChatScreen(chat: Chat(id: "jksdfhj", usersId: ['50f8153a-e1e0-48ba-b025-30a494788364', 'db4b6134-b9fd-41d3-8685-b390f7f9af63']),),
     );
   }
 }

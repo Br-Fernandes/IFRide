@@ -139,7 +139,7 @@ class _ExpandableRideCardState extends State<ExpandableRideCard> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const TimeSelector(),
+            TimeSelector(),
             const PassengerSelector(),
             const ValueDisplay(),
           ],

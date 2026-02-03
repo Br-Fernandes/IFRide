@@ -49,7 +49,7 @@ class RideCard extends StatelessWidget {
             children: [
               _CardHeader(),
               //const SizedBox(height: 20),
-              const TimeSelector(),
+              TimeSelector(),
               //const SizedBox(height: 20),
               const PassengerSelector(),
               //const SizedBox(height: 20),

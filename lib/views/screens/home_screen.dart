@@ -3,44 +3,57 @@ import 'package:if_ride/utils/cities.dart';
 import 'package:if_ride/views/widgets/city_card.dart';
 
 class HomeScreen extends StatelessWidget {
-  HomeScreen({super.key});
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
-      body: Column(
-        children: [
-          Expanded(
-            child: Center(
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: size.width * 0.06,
+                vertical: size.height * 0.03,
+              ),
               child: Text(
                 "Selecione seu destino",
+                textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 25,
-                  fontWeight: FontWeight.bold
+                  fontSize: size.width * 0.062,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
-            )
-          ),
-          ClipRRect(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(45),
-              topRight: Radius.circular(45)
             ),
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: MediaQuery.of(context).size.width * 0.03,
-                vertical: 45.0
+            Expanded(
+              child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(36),
+                  topRight: Radius.circular(36),
+                ),
+                child: Container(
+                  color: Colors.white,
+                  child: ListView.builder(
+                    padding: EdgeInsets.only(
+                      top: size.height * 0.02,
+                      bottom: size.height * 0.02,
+                    ),
+                    itemCount: cities.length,
+                    itemBuilder: (context, index) {
+                      return CityCard(cityName: cities[index]);
+                    },
+                  ),
+                ),
               ),
-              height: MediaQuery.of(context).size.height * 0.7,
-              color: Colors.white,
-              child: Column(
-                children: cities.map((city) => CityCard(cityName: city,)).toList(),
-              )
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ); 
+    );
   }
 }

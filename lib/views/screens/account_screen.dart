@@ -93,7 +93,7 @@ class AccountScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () => authController.logout(),
                     child: Text(
                      "Sair",
                      style: TextStyle(

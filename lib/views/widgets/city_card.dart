@@ -7,35 +7,48 @@ class CityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: MediaQuery.of(context).size.height * 0.08,
+    return InkWell(
+      onTap: () {},
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size. width * 0.03),
+            padding: EdgeInsets.symmetric(
+              horizontal: MediaQuery.of(context).size.width * 0.03,
+              vertical: MediaQuery.of(context).size.height * 0.016,
+            ),
             child: Row(
               children: [
                 Image.asset(
                   "assets/map.png",
-                  width: 50,
+                  width: MediaQuery.of(context).size.width * 0.1,
+                  height: MediaQuery.of(context).size.width * 0.1,
+                  fit: BoxFit.contain,
                 ),
-                SizedBox(width: MediaQuery.of(context).size.width * 0.07) ,
-                Text(
-                  cityName,
-                  style: TextStyle(
-                    color: Color(0xFF0B0A0A),
-                    fontSize: 22
-                  )
+                SizedBox(width: MediaQuery.of(context).size.width * 0.05),
+                Expanded(
+                  child: Text(
+                    cityName,
+                    style: TextStyle(
+                      color: const Color(0xFF0B0A0A),
+                      fontSize: MediaQuery.of(context).size.width * 0.055,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Icon(
+                  Icons.chevron_right,
+                  color: Colors.grey.shade400,
+                  size: MediaQuery.of(context).size.width * 0.06,
                 ),
               ],
             ),
           ),
-          SizedBox(height: MediaQuery.of(context).size.height * 0.01,),
           Container(
-            height: 2,
+            height: 1,
             width: double.infinity,
-            color: Colors.black
+            color: Colors.grey.shade200,
           ),
         ],
       ),

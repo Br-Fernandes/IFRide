@@ -3,10 +3,11 @@ import 'package:get/get.dart';
 import 'package:if_ride/controllers/new_ride_controller.dart';
 import 'package:if_ride/views/widgets/city_selector.dart';
 import 'package:if_ride/views/widgets/next_step_button.dart';
+import 'package:if_ride/views/widgets/vehicle_selector.dart';
 
 class StepOneRide extends StatelessWidget {
   StepOneRide({super.key});
-  
+
   final controller = Get.find<NewRideController>();
 
   @override
@@ -19,35 +20,37 @@ class StepOneRide extends StatelessWidget {
       children: [
         CitySelector(
           label: "De onde você vai sair?",
-          hint: "Selecione uma cidade",
+          hint: "Selecione a cidade",
           value: controller.fromCity.value,
-          onChanged: controller.fromCity,
+          onChanged: (v) => controller.fromCity.value = v,
         ),
         CitySelector(
           label: "Para onde você vai?",
-          hint: "Selecione uma cidade",
+          hint: "Selecione a cidade",
           value: controller.toCity.value,
-          onChanged: controller.toCity,
+          onChanged: (v) => controller.toCity.value = v,
         ),
-        CitySelector(
-          label: "Veículo",
-          hint: "Selecione seu veículo",
+        VehicleSelector(
           value: controller.vehicle.value,
-          onChanged: controller.vehicle,
+          onChanged: (v) => controller.vehicle.value = v,
         ),
+        SizedBox(height: padding.height * 0.03),
         Row(
           children: [
             Switch(
               value: controller.isRecurring.value,
-              onChanged: controller.isRecurring,
+              activeThumbColor: Theme.of(context).primaryColor,
+              onChanged: (v) => controller.isRecurring.value = v,
             ),
-            const Text("Carona Recorrente"),
+            const Text(
+              "Carona Recorrente",
+              style: TextStyle(fontSize: 16),
+            ),
           ],
         ),
         SizedBox(height: padding.height * 0.04),
-        Center(child: NextStepButton())
+        Center(child: NextStepButton()),
       ],
     ));
   }
 }
-

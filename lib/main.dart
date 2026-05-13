@@ -6,6 +6,7 @@ import 'package:if_ride/utils/themes.dart';
 import 'package:if_ride/views/screens/auth_screen.dart';
 import 'package:if_ride/views/screens/chat_screen.dart';
 import 'package:if_ride/views/screens/main_navigation_screen.dart';
+import 'package:if_ride/views/screens/new_ride_screen.dart';
 
 import 'utils/constants.dart';
 

@@ -15,9 +15,12 @@ class AuthController extends GetxController {
 
   final authStatus = AuthStatus.loading.obs;
   final currentUser = Rxn<User>();
+  final isDriver = false.obs;
 
   User? get user => currentUser.value;
   bool get isAuthenticated => authStatus.value == AuthStatus.authenticated;
+
+  void setIsDriver(bool value) => isDriver.value = value;
 
   @override
   void onInit() {

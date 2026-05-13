@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:if_ride/controllers/auth_controller.dart';
 import 'package:if_ride/views/screens/account_screen.dart';
 import 'package:if_ride/views/screens/home_screen.dart';
 import 'package:if_ride/views/screens/new_ride_screen.dart';
+import 'package:if_ride/views/screens/register_driver_screen.dart';
 import 'package:if_ride/views/screens/your_rides_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
@@ -52,6 +55,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         unselectedLabelStyle: TextStyle(fontSize: 12),
         backgroundColor: Colors.white,
         onTap: (index) {
+          if (index == 1) {
+            final authController = Get.find<AuthController>();
+            if (!authController.isDriver.value) {
+              Get.to(() => RegisterDriverScreen());
+              return;
+            }
+          }
           _pageController.animateToPage(
             index,
             duration: Duration(milliseconds: 500),

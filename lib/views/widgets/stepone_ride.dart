@@ -3,8 +3,6 @@ import 'package:get/get.dart';
 import 'package:if_ride/controllers/new_ride_controller.dart';
 import 'package:if_ride/views/widgets/city_selector.dart';
 import 'package:if_ride/views/widgets/next_step_button.dart';
-import 'package:if_ride/views/widgets/vehicle_selector.dart';
-
 class StepOneRide extends StatelessWidget {
   StepOneRide({super.key});
 
@@ -29,10 +27,6 @@ class StepOneRide extends StatelessWidget {
           hint: "Selecione a cidade",
           value: controller.toCity.value,
           onChanged: (v) => controller.toCity.value = v,
-        ),
-        VehicleSelector(
-          value: controller.vehicle.value,
-          onChanged: (v) => controller.vehicle.value = v,
         ),
         SizedBox(height: padding.height * 0.03),
         Row(

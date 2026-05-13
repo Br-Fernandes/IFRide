@@ -39,7 +39,6 @@ class NewRideController extends GetxController {
 
   var fromCity = RxnString();
   var toCity = RxnString();
-  var vehicle = RxnString();
   var isRecurring = false.obs;
 
   var rawValue = ''.obs;
@@ -89,7 +88,6 @@ class NewRideController extends GetxController {
         if (fromCity.value == null) return 'Selecione a cidade de origem.';
         if (toCity.value == null) return 'Selecione a cidade de destino.';
         if (fromCity.value == toCity.value) return 'Origem e destino não podem ser iguais.';
-        if (vehicle.value == null) return 'Selecione um veículo.';
         return null;
 
       case 1:
@@ -109,7 +107,7 @@ class NewRideController extends GetxController {
 
   Future<void> submitRide() async {
     // TODO: chamar RideService com os dados abaixo
-    // fromCity, toCity, vehicle, isRecurring
+    // fromCity, toCity, isRecurring
     // Não recorrente: TimeSelectorController, PassengerSelectorController, ValueController
     // Recorrente: weekDays.where((d) => d.enabled.value)
     Get.snackbar(

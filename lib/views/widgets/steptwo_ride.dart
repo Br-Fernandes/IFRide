@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:if_ride/controllers/new_ride_controller.dart';
 import 'package:if_ride/views/widgets/next_step_button.dart';
 import 'package:if_ride/views/widgets/ride_card_widgets/time_selector.dart';
-
 import 'ride_card_widgets/passenger_selector.dart';
 import 'ride_card_widgets/value_display.dart';
 
@@ -16,7 +17,7 @@ class SteptwoRide extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           RideCard(),
-          NextStepButton()
+          NextStepButton(),
         ],
       ),
     );
@@ -24,7 +25,7 @@ class SteptwoRide extends StatelessWidget {
 }
 
 class RideCard extends StatelessWidget {
-  const RideCard();
+  const RideCard({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -32,27 +33,22 @@ class RideCard extends StatelessWidget {
 
     return Material(
       elevation: 8,
-      color: Color(0xFFE8E7E7),
+      color: const Color(0xFFE8E7E7),
       borderRadius: BorderRadius.circular(20),
       clipBehavior: Clip.antiAlias,
-      
       child: Container(
-        height: size.height * 0.7,
+        height: size.height * 0.75,
         width: size.width * 0.8,
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.black12),
-        ),
+        decoration: BoxDecoration(border: Border.all(color: Colors.black12)),
         child: Container(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(context).size.height * 0.05),
+          padding: EdgeInsets.only(bottom: size.height * 0.05),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _CardHeader(),
-              //const SizedBox(height: 20),
+              const _CardHeader(),
+              _DateSelector(),
               TimeSelector(),
-              //const SizedBox(height: 20),
               PassengerSelector(),
-              //const SizedBox(height: 20),
               ValueDisplay(),
             ],
           ),
@@ -63,15 +59,15 @@ class RideCard extends StatelessWidget {
 }
 
 class _CardHeader extends StatelessWidget {
+  const _CardHeader();
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.1,
+      height: MediaQuery.of(context).size.height * 0.08,
       width: double.infinity,
       decoration: const BoxDecoration(
-        border: Border(
-          bottom: BorderSide(width: 1),
-        ),
+        border: Border(bottom: BorderSide(width: 1)),
       ),
       child: const Center(
         child: Text(
@@ -80,5 +76,46 @@ class _CardHeader extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class _DateSelector extends StatelessWidget {
+  _DateSelector();
+
+  final controller = Get.find<NewRideController>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() => Column(
+          children: [
+            const Text(
+              'Data de partida',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            GestureDetector(
+              onTap: () => controller.selectDate(context),
+              child: Container(
+                height: MediaQuery.of(context).size.height * 0.065,
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).canvasColor,
+                  borderRadius: BorderRadius.circular(45),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.calendar_today_outlined, size: 28),
+                    const SizedBox(width: 8),
+                    Text(
+                      controller.formattedDepartureDate,
+                      style: const TextStyle(fontSize: 18),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ));
   }
 }

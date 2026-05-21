@@ -235,7 +235,7 @@ class _DayCard extends StatelessWidget {
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
-                              "R\$ ${dayConfig.price.value}",
+                              dayConfig.formattedPrice,
                               style: const TextStyle(fontSize: 16),
                             ),
                           )),
@@ -278,9 +278,13 @@ class _DayCard extends StatelessWidget {
           keyboardType: TextInputType.number,
           decoration: const InputDecoration(
             prefixText: "R\$ ",
-            hintText: "00,00",
+            hintText: "0",
+            suffixText: ",00",
           ),
-          onChanged: dayConfig.updatePrice,
+          onChanged: (v) {
+            final reais = int.tryParse(v.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+            dayConfig.priceCents.value = reais * 100;
+          },
         ),
         actions: [
           TextButton(

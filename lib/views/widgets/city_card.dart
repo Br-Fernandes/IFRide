@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 
 class CityCard extends StatelessWidget {
-  const CityCard({super.key, required this.cityName});
+  const CityCard({super.key, required this.cityName, this.onTap});
 
   final String cityName;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {},
+      onTap: onTap,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

@@ -1,5 +1,3 @@
-import 'dart:io';
-
 enum AuthMode {signup, login}
 
 class AuthFormData {

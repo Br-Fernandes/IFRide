@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:if_ride/controllers/auth_controller.dart';
 import 'package:if_ride/controllers/register_driver_controller.dart';
-import 'package:image_picker/image_picker.dart';
 
 class RegisterDriverScreen extends StatelessWidget {
   RegisterDriverScreen({super.key});
@@ -28,52 +28,20 @@ class RegisterDriverScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildHeader(context),
+                _buildHeader(),
+                SizedBox(height: size.height * 0.03),
+                _buildInfoCard(),
                 SizedBox(height: size.height * 0.025),
-                _buildPhotoPicker(context, primaryColor),
-                SizedBox(height: size.height * 0.025),
-                _buildSectionTitle('Habilitação'),
-                const SizedBox(height: 10),
-                _buildTextField(
-                  label: 'Número da CNH',
-                  icon: Icons.badge_outlined,
-                  onSaved: (v) => controller.cnh.value = v ?? '',
-                  validator: (v) {
-                    if (v == null || v.trim().isEmpty) return 'Informe o número da CNH.';
-                    if (v.trim().length < 11) return 'CNH deve ter 11 dígitos.';
-                    return null;
-                  },
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
-                    LengthLimitingTextInputFormatter(11),
-                  ],
-                ),
-                SizedBox(height: size.height * 0.02),
-                _buildSectionTitle('Veículo'),
-                const SizedBox(height: 10),
-                _buildTextField(
-                  label: 'Modelo (ex: Fiat Uno, Branco)',
-                  icon: Icons.directions_car_outlined,
-                  onSaved: (v) => controller.vehicleModel.value = v ?? '',
-                  validator: (v) {
-                    if (v == null || v.trim().isEmpty) return 'Informe o modelo do veículo.';
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 10),
-                _buildTextField(
-                  label: 'Placa (ex: ABC1D23)',
-                  icon: Icons.pin_outlined,
-                  onSaved: (v) => controller.vehiclePlate.value = v ?? '',
-                  validator: (v) {
-                    if (v == null || v.trim().isEmpty) return 'Informe a placa do veículo.';
-                    if (v.trim().length < 7) return 'Placa inválida.';
-                    return null;
-                  },
-                  textCapitalization: TextCapitalization.characters,
-                ),
+                _buildSectionTitle('Dados da Habilitação'),
+                const SizedBox(height: 12),
+                _buildCnhField(),
+                const SizedBox(height: 12),
+                _buildCategoryDropdown(context, primaryColor),
+                const SizedBox(height: 12),
+                _buildExpirationPicker(context, primaryColor),
                 const Spacer(),
+                _buildCheckStatusButton(context, primaryColor),
+                const SizedBox(height: 10),
                 _buildSubmitButton(context, primaryColor),
               ],
             ),
@@ -83,9 +51,8 @@ class RegisterDriverScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader() {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         GestureDetector(
           onTap: () => Get.back(),
@@ -96,11 +63,11 @@ class RegisterDriverScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Cadastro de Motorista',
+              'Tornar-se Motorista',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             Text(
-              'Preencha os dados para oferecer caronas',
+              'Envie sua solicitação para análise',
               style: TextStyle(fontSize: 12, color: Colors.black45),
             ),
           ],
@@ -109,176 +76,162 @@ class RegisterDriverScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPhotoPicker(BuildContext context, Color primaryColor) {
-    return Obx(() {
-      final photo = controller.profilePhoto.value;
-      return Center(
-        child: Column(
-          children: [
-            GestureDetector(
-              onTap: () => _showPhotoOptions(context),
-              child: Stack(
-                alignment: Alignment.bottomRight,
-                children: [
-                  CircleAvatar(
-                    radius: 44,
-                    backgroundColor: Colors.grey.shade200,
-                    backgroundImage: photo != null ? FileImage(photo) : null,
-                    child: photo == null
-                        ? Icon(Icons.person, size: 44, color: Colors.grey.shade400)
-                        : null,
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                      color: primaryColor,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2),
-                    ),
-                    child: const Icon(Icons.camera_alt, size: 13, color: Colors.white),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              photo == null ? 'Adicionar foto de perfil *' : 'Alterar foto',
-              style: TextStyle(
-                fontSize: 12,
-                color: photo == null ? Colors.red.shade400 : Colors.black45,
-              ),
-            ),
-          ],
-        ),
-      );
-    });
-  }
-
-  void _showPhotoOptions(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (_) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Foto de perfil',
-              style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            _photoOption(
-              context,
-              icon: Icons.camera_alt_outlined,
-              label: 'Tirar foto',
-              onTap: () {
-                Navigator.pop(context);
-                controller.pickPhoto(ImageSource.camera);
-              },
-            ),
-            const SizedBox(height: 8),
-            _photoOption(
-              context,
-              icon: Icons.photo_library_outlined,
-              label: 'Escolher da galeria',
-              onTap: () {
-                Navigator.pop(context);
-                controller.pickPhoto(ImageSource.gallery);
-              },
-            ),
-          ],
-        ),
+  Widget _buildInfoCard() {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.blue.shade50,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.blue.shade100),
       ),
-    );
-  }
-
-  Widget _photoOption(
-    BuildContext context, {
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          color: Colors.grey.shade50,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: Colors.black54),
-            const SizedBox(width: 14),
-            Text(label, style: const TextStyle(fontSize: 15)),
-          ],
-        ),
+      child: const Row(
+        children: [
+          Icon(Icons.info_outline, color: Colors.blue, size: 20),
+          SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'Após o envio, um administrador irá analisar sua solicitação. Quando aprovada, você poderá cadastrar veículos e oferecer caronas.',
+              style: TextStyle(fontSize: 12, color: Colors.black54),
+            ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+    return Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold));
+  }
+
+  Widget _buildCnhField() {
+    return TextFormField(
+      onSaved: (v) => controller.cnhNumber.value = v ?? '',
+      validator: (v) {
+        if (v == null || v.trim().isEmpty) return 'Informe o número da CNH.';
+        if (v.trim().length != 11) return 'CNH deve ter exatamente 11 dígitos.';
+        return null;
+      },
+      keyboardType: TextInputType.number,
+      inputFormatters: [
+        FilteringTextInputFormatter.digitsOnly,
+        LengthLimitingTextInputFormatter(11),
+      ],
+      style: const TextStyle(fontSize: 14),
+      decoration: _inputDecoration('Número da CNH (11 dígitos)', Icons.badge_outlined),
     );
   }
 
-  Widget _buildTextField({
-    required String label,
-    required IconData icon,
-    required void Function(String?) onSaved,
-    required String? Function(String?) validator,
-    TextInputType keyboardType = TextInputType.text,
-    TextCapitalization textCapitalization = TextCapitalization.none,
-    List<TextInputFormatter>? inputFormatters,
-  }) {
-    return TextFormField(
-      onSaved: onSaved,
-      validator: validator,
-      keyboardType: keyboardType,
-      textCapitalization: textCapitalization,
-      inputFormatters: inputFormatters,
-      style: const TextStyle(fontSize: 14),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(color: Colors.black54, fontSize: 13),
-        prefixIcon: Icon(icon, size: 20),
-        isDense: true,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Colors.black26),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Colors.black87),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Colors.red),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Colors.red),
-        ),
-      ),
+  Widget _buildCategoryDropdown(BuildContext context, Color primaryColor) {
+    return DropdownButtonFormField<String>(
+      initialValue: controller.cnhCategory.value,
+      decoration: _inputDecoration('Categoria da CNH', Icons.category_outlined),
+      items: controller.cnhCategories
+          .map((cat) => DropdownMenuItem(value: cat, child: Text(cat)))
+          .toList(),
+      onChanged: (val) {
+        if (val != null) controller.cnhCategory.value = val;
+      },
     );
+  }
+
+  Widget _buildExpirationPicker(BuildContext context, Color primaryColor) {
+    return Obx(() => GestureDetector(
+          onTap: () => controller.selectExpiration(context),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.black26),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.calendar_today_outlined, size: 20, color: Colors.black54),
+                const SizedBox(width: 12),
+                Text(
+                  controller.cnhExpiration.value == null
+                      ? 'Validade da CNH *'
+                      : controller.formattedExpiration,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: controller.cnhExpiration.value == null
+                        ? Colors.black54
+                        : Colors.black87,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ));
+  }
+
+  Widget _buildCheckStatusButton(BuildContext context, Color primaryColor) {
+    final authController = Get.find<AuthController>();
+    return Obx(() => SizedBox(
+          width: double.infinity,
+          height: 48,
+          child: OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
+              foregroundColor: primaryColor,
+              side: BorderSide(color: primaryColor),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            ),
+            onPressed: authController.isCheckingRole.value
+                ? null
+                : () async {
+                    final canCheck = await authController.refreshRoleFromBackend();
+                    if (!canCheck) {
+                      // userId não disponível — re-login resolve
+                      Get.dialog(AlertDialog(
+                        title: const Text('Reconexão necessária'),
+                        content: const Text(
+                            'Saia e entre novamente para sincronizar seu status de motorista.'),
+                        actions: [
+                          TextButton(
+                              onPressed: () => Get.back(),
+                              child: const Text('Cancelar')),
+                          ElevatedButton(
+                              onPressed: () {
+                                Get.back();
+                                authController.logout();
+                              },
+                              child: const Text('Sair agora')),
+                        ],
+                      ));
+                    } else if (authController.isDriver) {
+                      Get.back();
+                      Get.snackbar(
+                        'Aprovado!',
+                        'Sua solicitação foi aprovada. Agora você é motorista!',
+                        snackPosition: SnackPosition.BOTTOM,
+                        backgroundColor: Colors.green.shade600,
+                        colorText: Colors.white,
+                        duration: const Duration(seconds: 4),
+                      );
+                    } else {
+                      Get.snackbar(
+                        'Ainda pendente',
+                        'Sua solicitação ainda não foi aprovada.',
+                        snackPosition: SnackPosition.BOTTOM,
+                        backgroundColor: Colors.orange.shade700,
+                        colorText: Colors.white,
+                      );
+                    }
+                  },
+            icon: authController.isCheckingRole.value
+                ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.refresh, size: 18),
+            label: Text(
+              authController.isCheckingRole.value
+                  ? 'Verificando...'
+                  : 'Verificar status da solicitação',
+              style: const TextStyle(fontSize: 14),
+            ),
+          ),
+        ));
   }
 
   Widget _buildSubmitButton(BuildContext context, Color primaryColor) {
@@ -289,25 +242,56 @@ class RegisterDriverScreen extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: primaryColor,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             ),
             onPressed: controller.isLoading.value
                 ? null
                 : () {
                     final isValid = _formKey.currentState?.validate() ?? false;
                     if (!isValid) return;
+                    if (controller.cnhExpiration.value == null) {
+                      Get.snackbar('Campo obrigatório', 'Selecione a data de validade da CNH.',
+                          snackPosition: SnackPosition.BOTTOM,
+                          backgroundColor: Colors.red.shade600,
+                          colorText: Colors.white);
+                      return;
+                    }
                     _formKey.currentState?.save();
                     controller.submit();
                   },
             child: controller.isLoading.value
                 ? const CircularProgressIndicator(color: Colors.white)
                 : const Text(
-                    'Cadastrar como motorista',
+                    'Enviar solicitação',
                     style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                   ),
           ),
         ));
+  }
+
+  InputDecoration _inputDecoration(String label, IconData icon) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: const TextStyle(color: Colors.black54, fontSize: 13),
+      prefixIcon: Icon(icon, size: 20),
+      isDense: true,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(color: Colors.black26),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(color: Colors.black87),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(color: Colors.red),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(color: Colors.red),
+      ),
+    );
   }
 }

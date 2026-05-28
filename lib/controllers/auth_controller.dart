@@ -34,9 +34,28 @@ class AuthController extends GetxController {
       authStatus.value = AuthStatus.unauthenticated;
       return;
     }
+    // Verifica se o token já expirou localmente antes de usá-lo
+    if (_isTokenExpired(storedToken)) {
+      await _storage.delete(key: tokenKey);
+      await _storage.delete(key: userRoleKey);
+      authStatus.value = AuthStatus.unauthenticated;
+      return;
+    }
     await _fetchCurrentUser(storedToken);
-    // Após carregar o usuário, verifica no backend se o role foi atualizado
     await refreshRoleFromBackend();
+  }
+
+  bool _isTokenExpired(String token) {
+    try {
+      final parts = token.split('.');
+      if (parts.length != 3) return true;
+      final payload = json.decode(utf8.decode(base64Url.decode(base64Url.normalize(parts[1]))));
+      final exp = payload['exp'] as int?;
+      if (exp == null) return false;
+      return DateTime.now().millisecondsSinceEpoch ~/ 1000 >= exp;
+    } catch (_) {
+      return true;
+    }
   }
 
   Future<void> _fetchCurrentUser(String token) async {
@@ -120,10 +139,14 @@ class AuthController extends GetxController {
       final response = await _authService.login(email: email, password: password);
       final token = response['token'] as String;
 
-      // Limpa role salvo localmente para sempre reler do backend no login
+      // Limpa dados do usuário anterior para não vazar nome/id entre sessões
       await _storage.delete(key: userRoleKey);
+      await _storage.delete(key: userNameKey);
+      await _storage.delete(key: userIdKey);
 
       await _storage.write(key: tokenKey, value: token);
+      if (response['id'] != null) await _storage.write(key: userIdKey, value: response['id'] as String);
+      if (response['name'] != null) await _storage.write(key: userNameKey, value: response['name'] as String);
       await _fetchCurrentUser(token);
       await refreshRoleFromBackend();
     } catch (e) {
@@ -173,6 +196,23 @@ class AuthController extends GetxController {
   }
 
   Future<void> refreshRole(String newRole) => _updateRoleLocally(newRole);
+
+  // Chamado pelos services quando o backend retorna 401 (token expirado/inválido).
+  // Desloga silenciosamente e redireciona para o login.
+  Future<void> handleExpiredToken() async {
+    currentUser.value = null;
+    await _storage.delete(key: tokenKey);
+    await _storage.delete(key: userRoleKey);
+    authStatus.value = AuthStatus.unauthenticated;
+    Get.snackbar(
+      'Sessão expirada',
+      'Sua sessão expirou. Por favor, faça login novamente.',
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.orange.shade700,
+      colorText: Colors.white,
+      duration: const Duration(seconds: 4),
+    );
+  }
 
   void updateUserId(String id) {
     final u = currentUser.value;

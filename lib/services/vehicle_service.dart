@@ -3,6 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:if_ride/models/vehicle.dart';
 import 'package:if_ride/utils/constants.dart';
+import 'package:if_ride/utils/http_guard.dart';
 
 class VehicleService {
   final _storage = const FlutterSecureStorage();
@@ -23,6 +24,7 @@ class VehicleService {
       body: jsonEncode(request.toJson()),
     );
 
+    if (!guardResponse(response)) throw Exception('Sessão expirada.');
     if (response.statusCode == 201 || response.statusCode == 200) {
       return VehicleResponse.fromJson(jsonDecode(response.body));
     }
@@ -36,6 +38,7 @@ class VehicleService {
     final url = Uri.parse('$baseUrl/v1/driver/$driverId/vehicles');
     final response = await http.get(url, headers: await _authHeaders());
 
+    if (!guardResponse(response)) throw Exception('Sessão expirada.');
     if (response.statusCode == 200) {
       final List<dynamic> list = jsonDecode(response.body);
       return list.map((e) => VehicleResponse.fromJson(e)).toList();
@@ -44,6 +47,7 @@ class VehicleService {
   }
 
   // Retorna apenas o status code — usado para verificar role sem lançar exceção.
+  // Não usa guardResponse pois 401 é esperado quando ainda é PASSENGER.
   Future<int> rawGet(Uri url, String? token) async {
     final response = await http.get(url, headers: {
       if (token != null) 'Authorization': 'Bearer $token',

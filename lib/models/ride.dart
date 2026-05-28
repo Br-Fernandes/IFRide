@@ -1,9 +1,6 @@
 import 'package:if_ride/models/vehicle.dart';
 
 class RideResponse {
-  // NOTA: o backend não retorna 'id' no RideResponseDTO.
-  // Para solicitar vaga ou gerenciar a carona, o backend precisa ser atualizado
-  // para incluir o campo 'id' no RideResponseDTO.
   final String? id;
   final DriverSummary driver;
   final VehicleResponse vehicle;
@@ -12,6 +9,8 @@ class RideResponse {
   final List<String> pickupPoints;
   final int availableSeats;
   final double price;
+  final DateTime? departureTime;
+  final String? rideStatus;
 
   RideResponse({
     this.id,
@@ -22,6 +21,8 @@ class RideResponse {
     required this.pickupPoints,
     required this.availableSeats,
     required this.price,
+    this.departureTime,
+    this.rideStatus,
   });
 
   factory RideResponse.fromJson(Map<String, dynamic> json) {
@@ -34,6 +35,10 @@ class RideResponse {
       pickupPoints: List<String>.from(json['pickupPoints'] ?? []),
       availableSeats: json['availableSeats'] ?? 0,
       price: (json['price'] as num?)?.toDouble() ?? 0.0,
+      departureTime: json['departureTime'] != null
+          ? DateTime.parse(json['departureTime'] as String)
+          : null,
+      rideStatus: json['rideStatus'] as String?,
     );
   }
 }

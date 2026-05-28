@@ -3,6 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:if_ride/models/driver_application.dart';
 import 'package:if_ride/utils/constants.dart';
+import 'package:if_ride/utils/http_guard.dart';
 
 class DriverService {
   final _storage = const FlutterSecureStorage();
@@ -25,6 +26,7 @@ class DriverService {
       body: jsonEncode(request.toJson()),
     );
 
+    if (!guardResponse(response)) throw Exception('Sessão expirada.');
     if (response.statusCode == 201 || response.statusCode == 200) {
       return DriverApplicationSummary.fromJson(jsonDecode(response.body));
     }

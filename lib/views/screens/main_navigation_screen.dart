@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:if_ride/controllers/auth_controller.dart';
 import 'package:if_ride/controllers/vehicle_controller.dart';
 import 'package:if_ride/views/screens/account_screen.dart';
+import 'package:if_ride/views/screens/conversations_screen.dart';
 import 'package:if_ride/views/screens/home_screen.dart';
 import 'package:if_ride/views/screens/new_ride_screen.dart';
 import 'package:if_ride/views/screens/register_driver_screen.dart';
@@ -25,6 +26,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen>
     BottomNavigationBarItem(icon: Icon(Icons.home_sharp), label: 'Início'),
     BottomNavigationBarItem(icon: Icon(Icons.add_circle), label: 'Oferecer'),
     BottomNavigationBarItem(icon: Icon(Icons.directions_car), label: 'Caronas'),
+    BottomNavigationBarItem(icon: Icon(Icons.message),label: 'Mensagens'),
     BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Conta'),
   ];
 
@@ -84,6 +86,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen>
           const HomeScreen(),
           NewRideScreen(),
           const YourRidesScreen(),
+          ConversationsScreen(),
           AccountScreen(),
         ],
       ),
@@ -94,6 +97,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen>
           items: _navItems,
           type: BottomNavigationBarType.fixed,
           selectedItemColor: Theme.of(context).primaryColor,
+          unselectedItemColor: Colors.grey,
           selectedLabelStyle: const TextStyle(fontSize: 12),
           unselectedLabelStyle: const TextStyle(fontSize: 12),
           backgroundColor: Colors.white,

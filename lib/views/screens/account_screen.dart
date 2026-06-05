@@ -86,13 +86,44 @@ class AccountScreen extends StatelessWidget {
               _ActionItem(
                 icon: Icons.delete_outline,
                 label: 'Excluir conta',
-                onTap: () {},
+                onTap: () => _confirmDeleteAccount(context),
                 color: Colors.red,
               ),
             ],
           ),
         );
       }),
+    );
+  }
+
+  void _confirmDeleteAccount(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Excluir conta'),
+        content: const Text(
+          'Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              // TODO: chamar endpoint de exclusão quando o backend estiver pronto
+              Get.snackbar(
+                'Funcionalidade em breve',
+                'A exclusão de conta ainda não está disponível.',
+                snackPosition: SnackPosition.BOTTOM,
+              );
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Excluir'),
+          ),
+        ],
+      ),
     );
   }
 

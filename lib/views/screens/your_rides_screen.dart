@@ -129,7 +129,7 @@ class _YourRidesScreenState extends State<YourRidesScreen>
           final p = _passengerRides[i];
           return _PassengerRideCard(
             participation: p,
-            onTap: () => Get.to(() => RideDetailScreen(ride: p.ride)),
+            onTap: () => Get.to(() => RideDetailScreen(ride: p.ride, participation: p)),
           );
         },
       ),

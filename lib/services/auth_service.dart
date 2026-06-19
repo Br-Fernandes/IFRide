@@ -1,8 +1,28 @@
 import 'dart:convert';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:if_ride/utils/constants.dart';
+import 'package:if_ride/utils/http_guard.dart';
 
 class AuthService {
+  final _storage = const FlutterSecureStorage();
+
+  Future<Map<String, String>> _authHeaders() async {
+    final token = await _storage.read(key: tokenKey);
+    return {
+      'Content-Type': 'application/json; charset=UTF-8',
+      if (token != null) 'Authorization': 'Bearer $token',
+    };
+  }
+
+  Future<void> deleteAccount() async {
+    final url = Uri.parse('$baseUrl/v1/users/me');
+    final response = await http.delete(url, headers: await _authHeaders());
+
+    if (!guardResponse(response)) throw Exception('Sessão expirada.');
+    if (response.statusCode == 204 || response.statusCode == 200) return;
+    throw Exception('Erro ao excluir conta: ${response.statusCode}');
+  }
   Future<Map<String, dynamic>> registerPassenger({
     required String name,
     required String email,

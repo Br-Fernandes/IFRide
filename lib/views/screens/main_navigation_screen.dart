@@ -57,7 +57,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen>
       // Antes de decidir, verifica se o role foi atualizado no backend
       await _authController.refreshRoleFromBackend();
 
-      if (!_authController.isDriver) {
+      if (!_authController.isDriver && !_authController.isAdmin) {
         Get.to(() => RegisterDriverScreen());
         return;
       }

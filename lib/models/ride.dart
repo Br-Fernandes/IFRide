@@ -48,7 +48,7 @@ class RideRequest {
   final String origin;
   final String destination;
   final List<String> pickupPoints;
-  final String departureTime; // formato: "2026-02-20T14:30:00"
+  final String? departureTime; // formato: "2026-02-20T14:30:00" — null para caronas recorrentes
   final int availableSeats;
   final double price;
   final bool isRecurrent;
@@ -60,7 +60,7 @@ class RideRequest {
     required this.origin,
     required this.destination,
     required this.pickupPoints,
-    required this.departureTime,
+    this.departureTime,
     required this.availableSeats,
     required this.price,
     this.isRecurrent = false,
@@ -74,11 +74,11 @@ class RideRequest {
       'origin': origin,
       'destination': destination,
       'pickupPoints': pickupPoints,
-      'departureTime': departureTime,
       'availableSeats': availableSeats,
       'price': price,
       'isRecurrent': isRecurrent,
     };
+    if (departureTime != null) map['departureTime'] = departureTime;
     if (isRecurrent) {
       map['recurrentDay'] = recurrentDay;
       map['recurrencyDeparture'] = recurrencyDeparture;

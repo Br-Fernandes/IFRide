@@ -97,9 +97,7 @@ class _RideDetailScreenState extends State<RideDetailScreen> {
                 onAccept: _acceptParticipant,
                 onReject: _rejectParticipant,
               ),
-            ] else if (!isDriver && ride.id == null)
-              _LimitationNote()
-            else if (!isDriver && ride.id != null)
+            ] else if (!isDriver)
               _PassengerParticipationSection(
                 ride: ride,
                 participationStatus: _participationStatus,
@@ -856,31 +854,6 @@ class _DetailsCard extends StatelessWidget {
   }
 }
 
-class _LimitationNote extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.orange.shade50,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.orange.shade200),
-      ),
-      child: const Row(
-        children: [
-          Icon(Icons.info_outline, color: Colors.orange, size: 20),
-          SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              'Para solicitar esta vaga, entre em contato com o motorista diretamente.',
-              style: TextStyle(fontSize: 12, color: Colors.black54),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class _RequestSeatButton extends StatelessWidget {
   const _RequestSeatButton({

@@ -21,6 +21,7 @@ class AuthController extends GetxController {
   User? get user => currentUser.value;
   bool get isAuthenticated => authStatus.value == AuthStatus.authenticated;
   bool get isDriver => currentUser.value?.isDriver ?? false;
+  bool get isAdmin => currentUser.value?.isAdmin ?? false;
 
   @override
   void onInit() {
@@ -103,6 +104,10 @@ class AuthController extends GetxController {
       final token = await _storage.read(key: tokenKey);
       final url = Uri.parse('$baseUrl/v1/driver/$userId/vehicles');
       final response = await _vehicleService.rawGet(url, token);
+
+      // ADMIN não pode ser detectado via endpoint de motorista — preserva o role
+      final currentRole = currentUser.value?.role ?? '';
+      if (currentRole == 'ADMIN') return true;
 
       if (response == 200) {
         await _updateRoleLocally('DRIVER');

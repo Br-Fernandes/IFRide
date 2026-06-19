@@ -20,6 +20,7 @@ class DriverApplicationRequest {
 }
 
 class DriverApplicationSummary {
+  final String id;
   final String requesterId;
   final String applicationStatus;
   final String cnhNumber;
@@ -28,6 +29,7 @@ class DriverApplicationSummary {
   final String? rejectionReason;
 
   DriverApplicationSummary({
+    required this.id,
     required this.requesterId,
     required this.applicationStatus,
     required this.cnhNumber,
@@ -39,6 +41,7 @@ class DriverApplicationSummary {
   factory DriverApplicationSummary.fromJson(Map<String, dynamic> json) {
     final requester = json['requester'] as Map<String, dynamic>? ?? {};
     return DriverApplicationSummary(
+      id: json['id']?.toString() ?? '',
       requesterId: requester['id']?.toString() ?? '',
       applicationStatus: json['applicationStatus'] ?? 'PENDING',
       cnhNumber: json['cnhNumber'] ?? '',

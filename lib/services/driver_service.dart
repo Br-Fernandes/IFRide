@@ -16,6 +16,20 @@ class DriverService {
     };
   }
 
+  Future<DriverApplicationSummary> getMyApplication() async {
+    final url = Uri.parse('$baseUrl/v1/driver-requests/me');
+    final response = await http.get(url, headers: await _authHeaders());
+
+    if (!guardResponse(response)) throw Exception('Sessão expirada.');
+    if (response.statusCode == 200) {
+      return DriverApplicationSummary.fromJson(jsonDecode(response.body));
+    }
+    if (response.statusCode == 404) {
+      throw Exception('Nenhuma solicitação encontrada.');
+    }
+    throw Exception('Erro ao buscar solicitação: ${response.statusCode}');
+  }
+
   // Envia solicitação de upgrade para motorista (CNH + dados da habilitação)
   // O backend valida que requesterId == usuário logado
   Future<DriverApplicationSummary> applyForDriver(DriverApplicationRequest request) async {

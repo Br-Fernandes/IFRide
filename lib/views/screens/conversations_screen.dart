@@ -16,6 +16,7 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
   final _chatService = ChatService();
   List<Conversation> _conversations = [];
   bool _isLoading = false;
+  String? _error;
 
   @override
   void initState() {
@@ -24,12 +25,15 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
   }
 
   Future<void> _loadConversations() async {
-    setState(() => _isLoading = true);
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
     try {
       final data = await _chatService.getConversations();
       setState(() => _conversations = data);
-    } catch (_) {
-      setState(() => _conversations = []);
+    } catch (e) {
+      setState(() => _error = e.toString().replaceAll('Exception: ', ''));
     } finally {
       setState(() => _isLoading = false);
     }
@@ -50,27 +54,31 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
       backgroundColor: Colors.white,
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : _conversations.isEmpty
-              ? _EmptyState()
-              : RefreshIndicator(
-                  onRefresh: _loadConversations,
-                  child: ListView.separated(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    itemCount: _conversations.length,
-                    separatorBuilder: (_, __) =>
-                        Divider(height: 1, color: Colors.grey.shade200),
-                    itemBuilder: (_, i) => _ConversationTile(
-                      conversation: _conversations[i],
+          : _error != null
+              ? _ErrorState(error: _error!, onRetry: _loadConversations)
+              : _conversations.isEmpty
+                  ? _EmptyState()
+                  : RefreshIndicator(
+                      onRefresh: _loadConversations,
+                      child: ListView.separated(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        itemCount: _conversations.length,
+                        separatorBuilder: (_, __) =>
+                            Divider(height: 1, color: Colors.grey.shade200),
+                        itemBuilder: (_, i) => _ConversationTile(
+                          conversation: _conversations[i],
+                          onReturn: _loadConversations,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
     );
   }
 }
 
 class _ConversationTile extends StatelessWidget {
-  const _ConversationTile({required this.conversation});
+  const _ConversationTile({required this.conversation, required this.onReturn});
   final Conversation conversation;
+  final VoidCallback onReturn;
 
   @override
   Widget build(BuildContext context) {
@@ -139,7 +147,38 @@ class _ConversationTile extends StatelessWidget {
             rideId: conversation.rideId,
             recipientId: otherId,
             recipientName: otherName,
-          )),
+          ))?.then((_) => onReturn()),
+    );
+  }
+}
+
+class _ErrorState extends StatelessWidget {
+  const _ErrorState({required this.error, required this.onRetry});
+  final String error;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.error_outline, size: 48, color: Colors.redAccent),
+            const SizedBox(height: 12),
+            Text(error,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.black54)),
+            const SizedBox(height: 16),
+            TextButton.icon(
+              onPressed: onRetry,
+              icon: const Icon(Icons.refresh),
+              label: const Text('Tentar novamente'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

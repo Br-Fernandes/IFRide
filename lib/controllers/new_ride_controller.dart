@@ -195,7 +195,6 @@ class NewRideController extends GetxController {
         origin: fromCity.value!,
         destination: toCity.value!,
         pickupPoints: List.from(pickupPoints),
-        departureTime: DateTime.now().add(const Duration(hours: 1)).toIso8601String(),
         availableSeats: day.passengerCount.value,
         price: day.priceCents.value / 100,
         isRecurrent: true,

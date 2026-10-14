@@ -63,6 +63,26 @@ class AuthService {
     }
   }
 
+  Future<void> updateProfile({required String name, String? city}) async {
+    final url = Uri.parse('$baseUrl/v1/users/me');
+    final body = <String, dynamic>{'name': name};
+    if (city != null && city.isNotEmpty) body['city'] = city;
+
+    final response = await http.patch(
+      url,
+      headers: await _authHeaders(),
+      body: jsonEncode(body),
+    );
+
+    if (!guardResponse(response)) throw Exception('Sessão expirada.');
+    if (response.statusCode == 200 || response.statusCode == 204) return;
+    if (response.statusCode == 400) {
+      final msg = _parseErrorMessage(response.body);
+      throw Exception(msg ?? 'Dados inválidos.');
+    }
+    throw Exception('Erro ao atualizar perfil: ${response.statusCode}');
+  }
+
   Future<Map<String, dynamic>> login({
     required String email,
     required String password,

@@ -11,6 +11,7 @@ class RideResponse {
   final double price;
   final DateTime? departureTime;
   final String? rideStatus;
+  final bool isRecurrent;
 
   RideResponse({
     this.id,
@@ -23,6 +24,7 @@ class RideResponse {
     required this.price,
     this.departureTime,
     this.rideStatus,
+    this.isRecurrent = false,
   });
 
   factory RideResponse.fromJson(Map<String, dynamic> json) {
@@ -39,6 +41,7 @@ class RideResponse {
           ? DateTime.parse(json['departureTime'] as String).toLocal()
           : null,
       rideStatus: json['rideStatus'] as String?,
+      isRecurrent: json['isRecurrent'] as bool? ?? false,
     );
   }
 }

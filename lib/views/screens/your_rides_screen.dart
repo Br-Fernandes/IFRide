@@ -24,6 +24,7 @@ class _YourRidesScreenState extends State<YourRidesScreen>
   bool _isLoadingDriver = false;
   String? _passengerError;
   String? _driverError;
+  bool _showOnlyActive = true;
 
   bool get _isDriver =>
       Get.find<AuthController>().isDriver;
@@ -85,6 +86,26 @@ class _YourRidesScreenState extends State<YourRidesScreen>
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: TextButton.icon(
+              style: TextButton.styleFrom(
+                foregroundColor: Theme.of(context).primaryColor,
+                visualDensity: VisualDensity.compact,
+              ),
+              icon: Icon(
+                _showOnlyActive ? Icons.history : Icons.directions_car_outlined,
+                size: 18,
+              ),
+              label: Text(
+                _showOnlyActive ? 'Histórico' : 'Ativas',
+                style: const TextStyle(fontSize: 13),
+              ),
+              onPressed: () => setState(() => _showOnlyActive = !_showOnlyActive),
+            ),
+          ),
+        ],
         bottom: TabBar(
           controller: _tabController,
           labelColor: Theme.of(context).primaryColor,
@@ -106,6 +127,31 @@ class _YourRidesScreenState extends State<YourRidesScreen>
     );
   }
 
+  static const _activePassengerStatuses = {'PENDING', 'ACCEPTED'};
+  static const _activeRideStatuses = {'SCHEDULED', 'FULL', 'IN_PROGRESS'};
+
+  List<RideParticipantResponse> get _filteredPassengerRides {
+    if (_showOnlyActive) {
+      return _passengerRides
+          .where((p) => _activePassengerStatuses.contains(p.status))
+          .toList();
+    }
+    return _passengerRides
+        .where((p) => !_activePassengerStatuses.contains(p.status))
+        .toList();
+  }
+
+  List<RideResponse> get _filteredDriverRides {
+    if (_showOnlyActive) {
+      return _driverRides
+          .where((r) => _activeRideStatuses.contains(r.rideStatus))
+          .toList();
+    }
+    return _driverRides
+        .where((r) => !_activeRideStatuses.contains(r.rideStatus))
+        .toList();
+  }
+
   Widget _buildPassengerTab() {
     if (_isLoadingPassenger) {
       return const Center(child: CircularProgressIndicator());
@@ -113,20 +159,23 @@ class _YourRidesScreenState extends State<YourRidesScreen>
     if (_passengerError != null) {
       return _ErrorState(message: _passengerError!, onRetry: _loadPassengerRides);
     }
-    if (_passengerRides.isEmpty) {
-      return const _EmptyState(
+    final list = _filteredPassengerRides;
+    if (list.isEmpty) {
+      return _EmptyState(
         icon: Icons.person_outline,
-        message: 'Você ainda não solicitou\nvagas em nenhuma carona.',
+        message: _showOnlyActive
+            ? 'Nenhuma carona ativa no momento.'
+            : 'Nenhuma carona no histórico.',
       );
     }
     return RefreshIndicator(
       onRefresh: _loadPassengerRides,
       child: ListView.separated(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-        itemCount: _passengerRides.length,
+        itemCount: list.length,
         separatorBuilder: (_, __) => const SizedBox(height: 12),
         itemBuilder: (_, i) {
-          final p = _passengerRides[i];
+          final p = list[i];
           return _PassengerRideCard(
             participation: p,
             onTap: () => Get.to(() => RideDetailScreen(ride: p.ride, participation: p)),
@@ -149,21 +198,24 @@ class _YourRidesScreenState extends State<YourRidesScreen>
     if (_driverError != null) {
       return _ErrorState(message: _driverError!, onRetry: _loadDriverRides);
     }
-    if (_driverRides.isEmpty) {
-      return const _EmptyState(
+    final list = _filteredDriverRides;
+    if (list.isEmpty) {
+      return _EmptyState(
         icon: Icons.directions_car_outlined,
-        message: 'Você ainda não criou\nnenhuma carona.',
+        message: _showOnlyActive
+            ? 'Nenhuma carona ativa no momento.'
+            : 'Nenhuma carona no histórico.',
       );
     }
     return RefreshIndicator(
       onRefresh: _loadDriverRides,
       child: ListView.separated(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-        itemCount: _driverRides.length,
+        itemCount: list.length,
         separatorBuilder: (_, __) => const SizedBox(height: 12),
         itemBuilder: (_, i) => _DriverRideCard(
-          ride: _driverRides[i],
-          onTap: () => Get.to(() => RideDetailScreen(ride: _driverRides[i])),
+          ride: list[i],
+          onTap: () => Get.to(() => RideDetailScreen(ride: list[i])),
         ),
       ),
     );

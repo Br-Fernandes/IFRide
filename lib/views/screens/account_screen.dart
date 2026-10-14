@@ -5,6 +5,7 @@ import 'package:if_ride/controllers/auth_controller.dart';
 import 'package:if_ride/models/driver_application.dart';
 import 'package:if_ride/services/auth_service.dart';
 import 'package:if_ride/services/driver_service.dart';
+import 'package:if_ride/views/screens/edit_profile_screen.dart';
 import 'package:if_ride/views/screens/vehicle_screen.dart';
 
 class AccountScreen extends StatefulWidget {
@@ -156,7 +157,7 @@ class _AccountScreenState extends State<AccountScreen> {
               _ActionItem(
                 icon: Icons.edit_outlined,
                 label: 'Alterar dados pessoais',
-                onTap: () {},
+                onTap: () => Get.to(() => const EditProfileScreen()),
               ),
               Container(
                 margin: EdgeInsets.symmetric(vertical: Get.height * 0.03),

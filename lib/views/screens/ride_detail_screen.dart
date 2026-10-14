@@ -27,6 +27,7 @@ class _RideDetailScreenState extends State<RideDetailScreen> {
   String? _participationId;
   bool _isUpdatingRideStatus = false;
   bool _isCancellingParticipation = false;
+  bool _isDisablingRecurrence = false;
 
   bool get _isOwner {
     final userId = Get.find<AuthController>().user?.id;
@@ -86,8 +87,18 @@ class _RideDetailScreenState extends State<RideDetailScreen> {
                 isProcessing: _isUpdatingRideStatus,
                 onStart: _startRide,
                 onFinish: _finishRide,
+                onCancel: _cancelRide,
                 primaryColor: primaryColor,
               ),
+              if (widget.ride.isRecurrent &&
+                  _rideStatus != 'FINISHED' &&
+                  _rideStatus != 'CANCELLED') ...[
+                const SizedBox(height: 12),
+                _DisableRecurrenceButton(
+                  isLoading: _isDisablingRecurrence,
+                  onPressed: _disableRecurrence,
+                ),
+              ],
               const SizedBox(height: 20),
               _ParticipantsSection(
                 participants: _participants,
@@ -117,7 +128,26 @@ class _RideDetailScreenState extends State<RideDetailScreen> {
   Future<void> _requestSeat() async {
     final ride = widget.ride;
     if (ride.id == null) return;
-    _doRequestSeat(ride.id!, ride.origin);
+
+    if (ride.pickupPoints.isEmpty) {
+      _doRequestSeat(ride.id!, ride.origin);
+      return;
+    }
+
+    // Pede ao passageiro que escolha o ponto de embarque
+    final picked = await showModalBottomSheet<String>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (_) => _PickupPointSheet(
+        origin: ride.origin,
+        pickupPoints: ride.pickupPoints,
+      ),
+    );
+    if (picked != null && mounted) {
+      _doRequestSeat(ride.id!, picked);
+    }
   }
 
   Future<void> _doRequestSeat(String rideId, String pickupPoint) async {
@@ -252,6 +282,80 @@ class _RideDetailScreenState extends State<RideDetailScreen> {
     }
   }
 
+  Future<void> _cancelRide() async {
+    if (widget.ride.id == null || _isUpdatingRideStatus) return;
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Cancelar carona'),
+        content: const Text('Tem certeza que deseja cancelar esta carona? Os passageiros serão notificados.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Não')),
+          TextButton(
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Cancelar carona'),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true) return;
+    setState(() => _isUpdatingRideStatus = true);
+    try {
+      await _rideService.cancelRide(widget.ride.id!);
+      if (!mounted) return;
+      setState(() => _rideStatus = 'CANCELLED');
+      Get.snackbar('Carona cancelada', 'A carona foi cancelada.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.orange.shade700,
+          colorText: Colors.white);
+    } catch (e) {
+      Get.snackbar('Erro', e.toString().replaceAll('Exception: ', ''),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red.shade600,
+          colorText: Colors.white);
+    } finally {
+      if (mounted) setState(() => _isUpdatingRideStatus = false);
+    }
+  }
+
+  Future<void> _disableRecurrence() async {
+    if (widget.ride.id == null || _isDisablingRecurrence) return;
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Desativar recorrência'),
+        content: const Text('Esta carona não será mais repetida automaticamente nas próximas semanas.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
+          TextButton(
+            style: TextButton.styleFrom(foregroundColor: Colors.orange),
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Desativar'),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true) return;
+    setState(() => _isDisablingRecurrence = true);
+    try {
+      await _rideService.disableRecurrence(widget.ride.id!);
+      if (!mounted) return;
+      Get.snackbar('Recorrência desativada', 'Esta carona não se repetirá mais.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green.shade600,
+          colorText: Colors.white);
+      Get.back();
+    } catch (e) {
+      Get.snackbar('Erro', e.toString().replaceAll('Exception: ', ''),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red.shade600,
+          colorText: Colors.white);
+    } finally {
+      if (mounted) setState(() => _isDisablingRecurrence = false);
+    }
+  }
+
   void _openChat() {
     if (widget.ride.id == null) return;
     Get.to(() => ChatScreen(
@@ -288,6 +392,7 @@ class _RideStatusActions extends StatelessWidget {
     required this.isProcessing,
     required this.onStart,
     required this.onFinish,
+    required this.onCancel,
     required this.primaryColor,
   });
 
@@ -295,6 +400,7 @@ class _RideStatusActions extends StatelessWidget {
   final bool isProcessing;
   final VoidCallback onStart;
   final VoidCallback onFinish;
+  final VoidCallback onCancel;
   final Color primaryColor;
 
   @override
@@ -316,6 +422,7 @@ class _RideStatusActions extends StatelessWidget {
     );
 
     Widget? actionButton;
+    Widget? cancelButton;
     switch (status) {
       case 'SCHEDULED':
       case 'FULL':
@@ -325,6 +432,13 @@ class _RideStatusActions extends StatelessWidget {
           color: primaryColor,
           isLoading: isProcessing,
           onPressed: isProcessing ? null : onStart,
+        );
+        cancelButton = _ActionButton(
+          label: 'Cancelar carona',
+          icon: Icons.cancel_outlined,
+          color: Colors.red,
+          outlined: true,
+          onPressed: isProcessing ? null : onCancel,
         );
         break;
       case 'IN_PROGRESS':
@@ -343,6 +457,7 @@ class _RideStatusActions extends StatelessWidget {
       children: [
         badge,
         if (actionButton != null) ...[const SizedBox(height: 12), actionButton],
+        if (cancelButton != null) ...[const SizedBox(height: 8), cancelButton],
       ],
     );
   }
@@ -894,6 +1009,96 @@ class _RequestSeatButton extends StatelessWidget {
               const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
         ),
       ),
+    );
+  }
+}
+
+class _DisableRecurrenceButton extends StatelessWidget {
+  const _DisableRecurrenceButton({required this.isLoading, required this.onPressed});
+  final bool isLoading;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: 48,
+      child: OutlinedButton.icon(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: Colors.orange.shade700,
+          side: BorderSide(color: Colors.orange.shade700),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        ),
+        onPressed: isLoading ? null : onPressed,
+        icon: isLoading
+            ? SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.orange.shade700),
+              )
+            : const Icon(Icons.repeat_outlined, size: 18),
+        label: Text(
+          isLoading ? 'Desativando...' : 'Desativar recorrência',
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+        ),
+      ),
+    );
+  }
+}
+
+class _PickupPointSheet extends StatelessWidget {
+  const _PickupPointSheet({required this.origin, required this.pickupPoints});
+  final String origin;
+  final List<String> pickupPoints;
+
+  @override
+  Widget build(BuildContext context) {
+    final allPoints = [origin, ...pickupPoints];
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const SizedBox(height: 12),
+        Container(
+          width: 40, height: 4,
+          decoration: BoxDecoration(
+            color: Colors.grey.shade300, borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        const SizedBox(height: 16),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20),
+          child: Text('Onde você embarcará?',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        ),
+        const SizedBox(height: 4),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20),
+          child: Text('Selecione o ponto de embarque',
+              style: TextStyle(color: Colors.black54, fontSize: 13)),
+        ),
+        const SizedBox(height: 8),
+        Flexible(
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: allPoints.length,
+            itemBuilder: (ctx, i) {
+              final point = allPoints[i];
+              final isOrigin = i == 0;
+              return ListTile(
+                leading: Icon(
+                  isOrigin ? Icons.radio_button_checked : Icons.location_on_outlined,
+                  color: isOrigin ? Colors.green : Colors.orange,
+                  size: 20,
+                ),
+                title: Text(point),
+                subtitle: isOrigin ? const Text('Origem', style: TextStyle(fontSize: 11)) : null,
+                onTap: () => Navigator.of(ctx).pop(point),
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 16),
+      ],
     );
   }
 }

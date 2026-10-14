@@ -158,4 +158,22 @@ class RideService {
       throw Exception(_errorMessage(response, 'Erro ao finalizar carona.'));
     }
   }
+
+  Future<void> cancelRide(String rideId) async {
+    final url = Uri.parse('$baseUrl/v1/rides/$rideId/cancel');
+    final response = await http.patch(url, headers: await _authHeaders());
+    if (!guardResponse(response)) throw Exception('Sessão expirada.');
+    if (response.statusCode != 204 && response.statusCode != 200) {
+      throw Exception(_errorMessage(response, 'Erro ao cancelar carona.'));
+    }
+  }
+
+  Future<void> disableRecurrence(String rideId) async {
+    final url = Uri.parse('$baseUrl/v1/rides/$rideId/disable-recurrence');
+    final response = await http.patch(url, headers: await _authHeaders());
+    if (!guardResponse(response)) throw Exception('Sessão expirada.');
+    if (response.statusCode != 204 && response.statusCode != 200) {
+      throw Exception(_errorMessage(response, 'Erro ao desativar recorrência.'));
+    }
+  }
 }

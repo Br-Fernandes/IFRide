@@ -47,7 +47,20 @@ class AuthService {
     if (response.statusCode == 409) {
       throw Exception('Este e-mail já está cadastrado.');
     }
+    if (response.statusCode == 400) {
+      final body = _parseErrorMessage(response.body);
+      throw Exception(body ?? 'Dados inválidos. Verifique os campos e tente novamente.');
+    }
     throw Exception('Falha ao registrar: ${response.statusCode}');
+  }
+
+  String? _parseErrorMessage(String body) {
+    try {
+      final json = jsonDecode(body) as Map<String, dynamic>;
+      return json['message']?.toString();
+    } catch (_) {
+      return null;
+    }
   }
 
   Future<Map<String, dynamic>> login({

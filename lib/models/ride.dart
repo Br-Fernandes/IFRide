@@ -36,7 +36,7 @@ class RideResponse {
       availableSeats: json['availableSeats'] ?? 0,
       price: (json['price'] as num?)?.toDouble() ?? 0.0,
       departureTime: json['departureTime'] != null
-          ? DateTime.parse(json['departureTime'] as String)
+          ? DateTime.parse(json['departureTime'] as String).toLocal()
           : null,
       rideStatus: json['rideStatus'] as String?,
     );
@@ -48,7 +48,7 @@ class RideRequest {
   final String origin;
   final String destination;
   final List<String> pickupPoints;
-  final String? departureTime; // formato: "2026-02-20T14:30:00" — null para caronas recorrentes
+  final String? departureTime; // formato ISO-8601 UTC, ex: "2026-02-20T14:30:00.000Z" — null para caronas recorrentes
   final int availableSeats;
   final double price;
   final bool isRecurrent;

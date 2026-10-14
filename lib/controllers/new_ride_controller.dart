@@ -174,7 +174,7 @@ class NewRideController extends GetxController {
         : 0.0;
 
     final dt = DateTime(date.year, date.month, date.day, time.hour, time.minute);
-    final departureStr = DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(dt);
+    final departureStr = dt.toUtc().toIso8601String();
 
     await _rideService.createRide(RideRequest(
       vehicleId: selectedVehicle.value!.id,

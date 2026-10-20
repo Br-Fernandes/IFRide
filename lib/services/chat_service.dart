@@ -8,8 +8,8 @@ import 'package:if_ride/models/conversation.dart';
 import 'package:stomp_dart_client/stomp.dart';
 import 'package:stomp_dart_client/stomp_config.dart';
 class ChatService {
-  static const _baseUrl = 'http://10.0.2.2:8080';
-  static const _wsUrl = 'ws://10.0.2.2:8080/ws';
+  static const _baseUrl = 'http://localhost:8080';
+  static const _wsUrl = 'ws://localhost:8080/ws';
 
   static const _ghostId = 'ghost-user-001';
   static const _ghostName = 'Usuário Fantasma';
